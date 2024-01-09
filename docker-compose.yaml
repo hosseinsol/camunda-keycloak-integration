@@ -1,0 +1,83 @@
+version: "3.9"
+
+services:
+  mssqlserver:
+    container_name: sqlserver_container
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    hostname: sqlserver_host
+    networks:
+      - tadkar_network
+    ports:
+      - 1444:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Password!23
+      - MSSQL_PID=Developer
+    volumes:
+      - "/mssql:/var/opt/mssql"
+
+  mssqlscripts:
+    container_name: sqlscript_container
+    image: mcr.microsoft.com/mssql-tools
+    hostname: sqlscript_host
+    networks:
+      - tadkar_network
+    depends_on:
+      - mssqlserver
+    command: /bin/bash -c 'until /opt/mssql-tools/bin/sqlcmd -S sqlserver_host -U sa -P "Password!23" -Q "create database keycloak"; do sleep 5; /opt/mssql-tools/bin/sqlcmd -S sqlserver_host -U sa -P "Password!23" -Q "use master; EXEC sp_sqljdbc_xa_install;"; done'
+
+  keycloak:
+    container_name: keycloak_container
+    hostname: keycloak_host
+    build:
+      context: .
+      dockerfile: dockerfile/keycloak-Dockerfile
+    networks:
+      - tadkar_network
+    restart: always
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - TZ=Iran/Tehran
+      - KC_HTTP_RELATIVE_PATH=/auth
+    depends_on:
+      - mssqlserver
+      - mssqlscripts
+    ports:
+      - "9001:8443"
+      - "9000:8080"
+    command:
+      - start-dev
+      - --https-certificate-file=/keycloak/config/ssl/cert.pem
+      - --https-certificate-key-file=/keycloak/config/ssl/key.pem
+      - --import-realm
+    volumes:
+      - ./ssl/cert.pem:/keycloak/config/ssl/cert.pem
+      - ./ssl/key.pem:/keycloak/config/ssl/key.pem
+      - ./import:/opt/keycloak/data/import
+      - ./export:/opt/keycloak/data/export
+
+  camunda:
+    build:
+      context: .
+      dockerfile: dockerfile/camunda-Dockerfile
+    container_name: camunda_container
+    hostname: camunda_host
+    networks:
+      - tadkar_network
+    ports:
+      - 8085:8080
+    env_file:
+      - ./env/camunda.env
+    depends_on:
+      - mssqlserver
+      - mssqlscripts
+      - keycloak
+    restart: always
+    volumes:
+      - ./config/default.yml:/camunda/configuration/default.yml
+      - ./config/production.yml:/camunda/configuration/production.yml
+
+networks:
+  tadkar_network:
+    driver: bridge

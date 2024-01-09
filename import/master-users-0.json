@@ -1,0 +1,43 @@
+{
+  "realm" : "master",
+  "users" : [ {
+    "id" : "6badc327-d459-4de4-9aa2-ecbf8e648c5e",
+    "createdTimestamp" : 1686146048357,
+    "username" : "keycloak",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "credentials" : [ {
+      "id" : "37f508b3-e1a8-4ffc-8cc9-91f391483c66",
+      "type" : "password",
+      "createdDate" : 1686146048569,
+      "secretData" : "{\"value\":\"vpzvw38vF+1ruP2m8W4gQhjxzNJ9XIs/yc/fo1eV9WA=\",\"salt\":\"UAfNJUpaVea7TjSISL34Kg==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-master", "admin" ],
+    "clientRoles" : {
+      "camunda-realm" : [ "view-authorization", "view-events", "manage-events", "manage-authorization", "query-realms", "view-identity-providers", "view-users", "query-users", "manage-identity-providers", "create-client", "view-realm", "manage-realm", "query-groups", "manage-users", "manage-clients", "view-clients", "query-clients" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "dd8839f4-b31a-41c5-bcb0-e10f45a6e4b2",
+    "createdTimestamp" : 1704692174561,
+    "username" : "service-account-admin-cli",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "serviceAccountClientId" : "admin-cli",
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-master" ],
+    "clientRoles" : {
+      "camunda-realm" : [ "manage-users" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ ]
+  } ]
+}
