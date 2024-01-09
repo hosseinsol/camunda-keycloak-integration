@@ -14,7 +14,7 @@ services:
       - MSSQL_SA_PASSWORD=Password!23
       - MSSQL_PID=Developer
     volumes:
-      - "/mssql:/var/opt/mssql"
+      - "./mssql:/var/opt/mssql"
 
   mssqlscripts:
     container_name: sqlscript_container
