@@ -6,7 +6,7 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     hostname: sqlserver_host
     networks:
-      - tadkar_network
+      - integration_network
     ports:
       - 1444:1433
     environment:
@@ -21,7 +21,7 @@ services:
     image: mcr.microsoft.com/mssql-tools
     hostname: sqlscript_host
     networks:
-      - tadkar_network
+      - integration_network
     depends_on:
       - mssqlserver
     command: /bin/bash -c 'until /opt/mssql-tools/bin/sqlcmd -S sqlserver_host -U sa -P "Password!23" -Q "create database keycloak"; do sleep 5; /opt/mssql-tools/bin/sqlcmd -S sqlserver_host -U sa -P "Password!23" -Q "use master; EXEC sp_sqljdbc_xa_install;"; done'
@@ -33,7 +33,7 @@ services:
       context: .
       dockerfile: dockerfile/keycloak-Dockerfile
     networks:
-      - tadkar_network
+      - integration_network
     restart: always
     environment:
       - KEYCLOAK_ADMIN=admin
@@ -55,7 +55,6 @@ services:
       - ./ssl/cert.pem:/keycloak/config/ssl/cert.pem
       - ./ssl/key.pem:/keycloak/config/ssl/key.pem
       - ./import:/opt/keycloak/data/import
-      - ./export:/opt/keycloak/data/export
 
   camunda:
     build:
@@ -64,7 +63,7 @@ services:
     container_name: camunda_container
     hostname: camunda_host
     networks:
-      - tadkar_network
+      - integration_network
     ports:
       - 8085:8080
     env_file:
@@ -79,5 +78,5 @@ services:
       - ./config/production.yml:/camunda/configuration/production.yml
 
 networks:
-  tadkar_network:
+  integration_network:
     driver: bridge

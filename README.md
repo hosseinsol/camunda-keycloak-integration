@@ -33,6 +33,12 @@
    - Enable client authentication and check the service account roles checkbox.
    - Assign the `create-user` role to the admin-cli client in `service account roles`.
 
+**## Export:**
+  ```bash
+   docker exec -it keycloak_container /bin/sh
+   /opt/keycloak/bin/kc.sh export --dir /opt/keycloak/data/import
+   ```
+
 **## Key Features:**
 
 - **Docker Compose setup:** Easy deployment and management of containers.
