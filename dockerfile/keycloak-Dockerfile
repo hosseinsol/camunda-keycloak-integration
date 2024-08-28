@@ -1,4 +1,4 @@
-FROM quay.io/keycloak/keycloak:23.0.1 as builder
+FROM quay.io/keycloak/keycloak:25.0 as builder
 
 RUN echo "Show-config before build"
 RUN /opt/keycloak/bin/kc.sh show-config
@@ -7,8 +7,6 @@ RUN /opt/keycloak/bin/kc.sh show-config
 ENV KC_HEALTH_ENABLED=true
 ENV KC_METRICS_ENABLED=true
 
-# Configure a database vendor
-ENV KC_DB=mssql
 
 
 WORKDIR /opt/keycloak
@@ -25,10 +23,7 @@ RUN /opt/keycloak/bin/kc.sh build --db=mssql  --transaction-xa-enabled=true -Dqu
 COPY config/quarkus.properties /opt/keycloak/conf/
 COPY config/keycloak.conf /opt/keycloak/conf/
 
-
-FROM quay.io/keycloak/keycloak:23.0.1
-
-COPY --from=builder /opt/keycloak/ /opt/keycloak/
+COPY plugin/koreui-999-SNAPSHOT.jar /opt/keycloak/providers/
 # change these values to point to a running postgres instance
 ENV KC_DB=mssql
 ENV KC_DB_URL=jdbc:sqlserver://sqlserver_host;databaseName=Keycloak;encrypt=false;trustServerCertificate=false;loginTimeout=30
