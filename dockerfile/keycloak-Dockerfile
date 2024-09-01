@@ -25,10 +25,10 @@ COPY config/keycloak.conf /opt/keycloak/conf/
 
 COPY plugin/koreui-999-SNAPSHOT.jar /opt/keycloak/providers/
 # change these values to point to a running postgres instance
-ENV KC_DB=mssql
-ENV KC_DB_URL=jdbc:sqlserver://sqlserver_host;databaseName=Keycloak;encrypt=false;trustServerCertificate=false;loginTimeout=30
-ENV KC_DB_USERNAME=sa
-ENV KC_DB_PASSWORD=Password!23
+ENV KC_DB=oracle
+ENV KC_DB_URL=jdbc:oracle:thin:@//oracle:1521/xepdb1
+ENV KC_DB_USERNAME=keycloak_owner
+ENV KC_DB_PASSWORD=password
 #ENV KC_HOSTNAME=
 ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
 #CMD ["start-dev"]

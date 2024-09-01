@@ -1,30 +1,19 @@
 version: "3.9"
 
 services:
-  mssqlserver:
-    container_name: sqlserver_container
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    hostname: sqlserver_host
-    networks:
-      - integration_network
-    ports:
-      - 1444:1433
+  oracle:
+    image: container-registry.oracle.com/database/express:21.3.0-xe
+    hostname: oracle_host
+    container_name: oracle_container
+    # platform: linux/amd64
     environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=Password!23
-      - MSSQL_PID=Developer
-    volumes:
-      - "./mssql:/var/opt/mssql"
-
-  mssqlscripts:
-    container_name: sqlscript_container
-    image: mcr.microsoft.com/mssql-tools
-    hostname: sqlscript_host
-    networks:
-      - integration_network
-    depends_on:
-      - mssqlserver
-    command: /bin/bash -c 'until /opt/mssql-tools/bin/sqlcmd -S sqlserver_host -U sa -P "Password!23" -Q "create database keycloak"; do sleep 5; /opt/mssql-tools/bin/sqlcmd -S sqlserver_host -U sa -P "Password!23" -Q "use master; EXEC sp_sqljdbc_xa_install;"; done'
+      - ORACLE_SID=XE
+      - ORACLE_PWD=secret
+    ports:
+      - "1521:1521"
+      - "5500:5500"
+    # volumes:
+    #   - ./oracle_data:/opt/oracle/oradata
 
   keycloak:
     container_name: keycloak_container
@@ -41,8 +30,7 @@ services:
       - TZ=Iran/Tehran
       - KC_HTTP_RELATIVE_PATH=/auth
     depends_on:
-      - mssqlserver
-      - mssqlscripts
+      - oracle
     ports:
       - "9001:8443"
       - "9000:8080"
@@ -69,8 +57,6 @@ services:
     env_file:
       - ./env/camunda.env
     depends_on:
-      - mssqlserver
-      - mssqlscripts
       - keycloak
     restart: always
     volumes:
